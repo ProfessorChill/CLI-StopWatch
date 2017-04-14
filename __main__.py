@@ -1,8 +1,9 @@
+import sys
+import threading
+import curses
+
 from time import sleep
 from curses import wrapper
-
-import curses
-import threading
 
 
 class StopWatch(threading.Thread):
@@ -22,16 +23,6 @@ class StopWatch(threading.Thread):
                 StopWatch.minutes = 1
 
 
-# The input here does not work
-class GetInput(threading.Thread):
-    def run(self):
-        while True:
-            c = main.stdscr.getch()
-            if c == 27:
-                break
-        exit(main.stdscr)
-
-
 def main(stdscr):
     curses.echo()
     StopWatch().start()
@@ -47,14 +38,8 @@ def main(stdscr):
         c = stdscr.getch()
         if c == 27:
             break
-    exit(stdscr)
+    sys.exit()
 
-
-def exit(stdscr):
-    curses.nocbreak()
-    stdscr.keypad(False)
-    curses.echo()
-    curses.endwin()
 
 if __name__ == '__main__':
     stdscr = curses.initscr()
