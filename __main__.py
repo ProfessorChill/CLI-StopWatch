@@ -22,16 +22,6 @@ class StopWatch(threading.Thread):
                 StopWatch.minutes = 1
 
 
-# The input here does not work
-class GetInput(threading.Thread):
-    def run(self):
-        while True:
-            c = main.stdscr.getch()
-            if c == 27:
-                break
-        exit(main.stdscr)
-
-
 def main(stdscr):
     curses.echo()
     StopWatch().start()
