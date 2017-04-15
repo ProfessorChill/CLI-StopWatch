@@ -12,7 +12,7 @@ class StopWatch(threading.Thread):
     hours = 0
 
     def run(self):
-        while True:
+        while MainProgram.running:
             sleep(1)
             StopWatch.seconds = StopWatch.seconds + 1
             if StopWatch.seconds == 60:
@@ -23,22 +23,27 @@ class StopWatch(threading.Thread):
                 StopWatch.minutes = 1
 
 
-def main(stdscr):
-    curses.echo()
-    StopWatch().start()
-    while True:
-        sleep(0.10)
-        stdscr.clear()
-        strToDisp = '{} Seconds | {} Minutes | {} Hours'
-        strToDisp = strToDisp.format(StopWatch.seconds,
-                                     StopWatch.minutes,
-                                     StopWatch.hours)
-        stdscr.addstr(0, 0, strToDisp)
-        stdscr.refresh()
-        c = stdscr.getch()
-        if c == 27:
-            break
-    sys.exit()
+class MainProgram:
+    running = True
+
+    def run(stdscr):
+        curses.echo()
+        thread = StopWatch()
+        thread.start()
+        while True:
+            sleep(0.10)
+            stdscr.clear()
+            strToDisp = '{} Seconds | {} Minutes | {} Hours'
+            strToDisp = strToDisp.format(StopWatch.seconds,
+                                         StopWatch.minutes,
+                                         StopWatch.hours)
+            stdscr.addstr(0, 0, strToDisp)
+            stdscr.refresh()
+            c = stdscr.getch()
+            if c == 27:
+                break
+        MainProgram.running = False
+        sys.exit()
 
 
 if __name__ == '__main__':
@@ -47,4 +52,4 @@ if __name__ == '__main__':
     curses.cbreak()
     stdscr.keypad(True)
     stdscr.nodelay(1)
-    wrapper(main)
+    wrapper(MainProgram.run)
