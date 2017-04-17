@@ -29,6 +29,7 @@ class StopWatch(threading.Thread):
 
 class MainProgram:
     running = True
+    watchToControl = 0
 
     def run(stdscr):
         curses.echo()
@@ -38,7 +39,10 @@ class MainProgram:
             sleep(0.10)
             stdscr.clear()
             for x in range(0, len(StopWatch.seconds)):
-                strToDisp = '{} Seconds | {} Minutes | {} Hours'
+                if x == MainProgram.watchToControl:
+                    strToDisp = '--> {} Seconds | {} Minutes | {} Hours'
+                else:
+                    strToDisp = '{} Seconds | {} Minutes | {} Hours'
                 strToDisp = strToDisp.format(StopWatch.seconds[x],
                                              StopWatch.minutes[x],
                                              StopWatch.hours[x])
@@ -47,14 +51,24 @@ class MainProgram:
             c = stdscr.getch()
             if c == 27:
                 break
-            elif c == 259:
+            elif c == 259:  # Up Arrow
+                currNum = MainProgram.watchToControl
+                if currNum > 0:
+                    currNum = currNum - 1
+                    MainProgram.watchToControl = currNum
+            elif c == 258:  # Down Arrow
+                currNum = MainProgram.watchToControl
+                if currNum < len(StopWatch.seconds)-1:
+                    currNum = currNum + 1
+                    MainProgram.watchToControl = currNum
+            elif c == 260:  # Left Arrow
+                StopWatch.seconds.pop(MainProgram.watchToControl)
+                StopWatch.minutes.pop(MainProgram.watchToControl)
+                StopWatch.hours.pop(MainProgram.watchToControl)
+            elif c == 261:  # Right Arrow
                 StopWatch.seconds.append(0)
                 StopWatch.minutes.append(0)
                 StopWatch.hours.append(0)
-            elif c == 258:
-                StopWatch.seconds.pop(len(StopWatch.seconds)-1)
-                StopWatch.minutes.pop(len(StopWatch.minutes)-1)
-                StopWatch.hours.pop(len(StopWatch.hours)-1)
         MainProgram.running = False
         sys.exit()
 
