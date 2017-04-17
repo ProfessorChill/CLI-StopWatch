@@ -21,10 +21,10 @@ class StopWatch(threading.Thread):
                 StopWatch.seconds[x] = StopWatch.seconds[x] + 1
                 if StopWatch.seconds[x] == 60:
                     StopWatch.minutes[x] = StopWatch.minutes[x] + 1
-                    StopWatch.seconds[x] = 1
+                    StopWatch.seconds[x] = 0
                 if StopWatch.minutes[x] == 60:
                     StopWatch.hours[x] = StopWatch.hours[x] + 1
-                    StopWatch.minutes[x] = 1
+                    StopWatch.minutes[x] = 0
 
 
 class MainProgram:
