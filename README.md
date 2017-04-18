@@ -16,5 +16,7 @@ RIGHT ARROW - Add stopwatch
 
 LEFT ARROW - Remove selected stopwatch
 
+P - Pause/Start selected stopwatch
+
 ###### Known Bugs
 - Upon closing you must wait one second for the program to actually close, this is because of the sleep(1) in the StopWatch main loop.
