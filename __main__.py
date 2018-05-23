@@ -1,12 +1,13 @@
+""" Just a simple CLI Stopwatch that supports multiple watches """
 import sys
 import threading
 import curses
 
 from time import sleep
-from curses import wrapper
 
 
 class StopWatch(threading.Thread):
+    """ The stopwatch class which handles the counting of all watches """
     seconds = []
     minutes = []
     hours = []
@@ -16,80 +17,89 @@ class StopWatch(threading.Thread):
     hours.append(0)
 
     def run(self):
-        while MainProgram.running:
+        while APP.running:
             sleep(1)
-            for x in range(0, len(StopWatch.seconds)):
-                if x not in StopWatch.paused:
-                    StopWatch.seconds[x] = StopWatch.seconds[x] + 1
-                    if StopWatch.seconds[x] == 60:
-                        StopWatch.minutes[x] = StopWatch.minutes[x] + 1
-                        StopWatch.seconds[x] = 0
-                    if StopWatch.minutes[x] == 60:
-                        StopWatch.hours[x] = StopWatch.hours[x] + 1
-                        StopWatch.minutes[x] = 0
+            for watch in range(0, len(StopWatch.seconds)):
+                if watch not in StopWatch.paused:
+                    StopWatch.seconds[watch] = StopWatch.seconds[watch] + 1
+                    if StopWatch.seconds[watch] == 60:
+                        StopWatch.minutes[watch] = StopWatch.minutes[watch] + 1
+                        StopWatch.seconds[watch] = 0
+                    if StopWatch.minutes[watch] == 60:
+                        StopWatch.hours[watch] = StopWatch.hours[watch] + 1
+                        StopWatch.minutes[watch] = 0
 
 
 class MainProgram:
-    running = True
-    watchToControl = 0
+    """ The main program handler """
+    def __init__(self):
+        self.running = True
+        self.watch_to_control = 0
+        self.num_watches = 1
 
-    def run(stdscr):
+    def display(self, stdscr):
+        """ Used to display the watches """
+        for watch in range(0, len(StopWatch.seconds)):
+            if watch == self.watch_to_control and watch in StopWatch.paused:
+                str_to_disp = '--> {} Seconds | {} Minutes | {} Hours - P'
+            elif watch == self.watch_to_control:
+                str_to_disp = '--> {} Seconds | {} Minutes | {} Hours'
+            elif watch in StopWatch.paused:
+                str_to_disp = '{} Seconds | {} Minutes | {} Hours - P'
+            else:
+                str_to_disp = '{} Seconds | {} Minutes | {} Hours'
+
+            str_to_disp = str_to_disp.format(StopWatch.seconds[watch],
+                                             StopWatch.minutes[watch],
+                                             StopWatch.hours[watch])
+            stdscr.addstr(watch, 0, str_to_disp)
+
+    def run(self, stdscr):
+        """ The main run loop """
         curses.echo()
         thread = StopWatch()
         thread.start()
-        while True:
+        while self.running:
             sleep(0.10)
             stdscr.clear()
-            for x in range(0, len(StopWatch.seconds)):
-                if x == MainProgram.watchToControl and x in StopWatch.paused:
-                    strToDisp = '--> {} Seconds | {} Minutes | {} Hours - P'
-                elif x == MainProgram.watchToControl:
-                    strToDisp = '--> {} Seconds | {} Minutes | {} Hours'
-                elif x in StopWatch.paused:
-                    strToDisp = '{} Seconds | {} Minutes | {} Hours - P'
-                else:
-                    strToDisp = '{} Seconds | {} Minutes | {} Hours'
-                strToDisp = strToDisp.format(StopWatch.seconds[x],
-                                             StopWatch.minutes[x],
-                                             StopWatch.hours[x])
-                stdscr.addstr(x, 0, strToDisp)
+            self.display(stdscr)
             stdscr.refresh()
-            c = stdscr.getch()
-            if c == 27:
-                break
-            elif c == 259:  # Up Arrow
-                currNum = MainProgram.watchToControl
-                if currNum > 0:
-                    currNum = currNum - 1
-                    MainProgram.watchToControl = currNum
-            elif c == 258:  # Down Arrow
-                currNum = MainProgram.watchToControl
-                if currNum < len(StopWatch.seconds)-1:
-                    currNum = currNum + 1
-                    MainProgram.watchToControl = currNum
-            elif c == 260:  # Left Arrow
-                StopWatch.seconds.pop(MainProgram.watchToControl)
-                StopWatch.minutes.pop(MainProgram.watchToControl)
-                StopWatch.hours.pop(MainProgram.watchToControl)
-                if MainProgram.watchToControl in StopWatch.paused:
-                    StopWatch.paused.remove(MainProgram.watchToControl)
-            elif c == 261:  # Right Arrow
+            char = stdscr.getch()
+
+            if char == 27:
+                self.running = False
+            elif char == 259 and self.watch_to_control > 0:  # Up Arrow
+                self.watch_to_control -= 1
+            elif char == 258 and self.watch_to_control + 1 < self.num_watches:  # Down Arrow
+                self.watch_to_control += 1
+            elif char == 260:  # Left Arrow
+                StopWatch.seconds.pop(self.watch_to_control)
+                StopWatch.minutes.pop(self.watch_to_control)
+                StopWatch.hours.pop(self.watch_to_control)
+                self.num_watches -= 1
+
+                if self.watch_to_control > 0:
+                    self.watch_to_control -= 1
+
+                if self.watch_to_control in StopWatch.paused:
+                    StopWatch.paused.remove(self.watch_to_control)
+            elif char == 261:  # Right Arrow
                 StopWatch.seconds.append(0)
                 StopWatch.minutes.append(0)
                 StopWatch.hours.append(0)
-            elif c == 112:  # P
-                if MainProgram.watchToControl in StopWatch.paused:
-                    StopWatch.paused.remove(MainProgram.watchToControl)
-                else:
-                    StopWatch.paused.append(MainProgram.watchToControl)
-        MainProgram.running = False
+                self.num_watches += 1
+            elif char == 112 and self.watch_to_control in StopWatch.paused:  # P
+                StopWatch.paused.remove(self.watch_to_control)
+            elif char == 112 and self.watch_to_control not in StopWatch.paused:  # P
+                StopWatch.paused.append(self.watch_to_control)
         sys.exit()
 
 
 if __name__ == '__main__':
-    stdscr = curses.initscr()
+    STDSCR = curses.initscr()
+    APP = MainProgram()
     curses.noecho()
     curses.cbreak()
-    stdscr.keypad(True)
-    stdscr.nodelay(1)
-    wrapper(MainProgram.run)
+    STDSCR.keypad(True)
+    STDSCR.nodelay(1)
+    curses.wrapper(APP.run)
