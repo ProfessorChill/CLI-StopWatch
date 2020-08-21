@@ -1,8 +1,10 @@
 # CLI-StopWatch
+
 Just a simple CLI StopWatch that supports multiple watches.
 
-Created in Python it is very simple and easy to understand
-example of the `threading` module usage.
+> It is also very simple and easy to understand example
+> of how to use the Python
+> [`threading`](https://docs.python.org/library/threading) module.
 
 ##### Requirements
 - Python 3
