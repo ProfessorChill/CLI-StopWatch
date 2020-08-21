@@ -1,19 +1,21 @@
 # CLI-StopWatch
-Just a simple CLI StopWatch created in Python
+
+Just a simple CLI StopWatch that supports multiple watches.
+
+> It is also very simple and easy to understand example
+> of how to use the Python
+> [`threading`](https://docs.python.org/library/threading) module.
 
 ##### Requirements
 - Python 3
 - Curses
 
 ##### Shortcuts
-Key | Explination
+Key | Explanation
 ------------ | -------------
-ESC | You may have to press this multiple times however it will close.
-UP ARROW | Move up stopwatch list
-DOWN ARROW | Move down stopwatch list
-RIGHT ARROW | Add stopwatch
-LEFT ARROW | Remove selected stopwatch
-P | Pause/Start selected stopwatch
-
-###### Known Bugs
-- Upon closing you must wait one second for the program to actually close, this is because of the sleep(1) in the StopWatch main loop.
+<kbd>ESC</kbd> | Press it (multiple times) it will close
+<kbd>↑</kbd> | Move up stopwatch list
+<kbd>↓</kbd> | Move down stopwatch list
+<kbd>→</kbd> | Add stopwatch
+<kbd>←</kbd> | Remove selected stopwatch
+<kbd>P</kbd> | Pause/Start selected stopwatch
